@@ -1,0 +1,16 @@
+
+Artificial Intelligence (AI) is a branch of computer science that aims to create intelligent machines 
+that can perform tasks that typically require human intelligence. These tasks include learning, 
+reasoning, problem-solving, perception, and language understanding.
+
+Machine Learning is a subset of AI that provides systems the ability to automatically learn and 
+improve from experience without being explicitly programmed. It focuses on the development of 
+computer programs that can access data and use it to learn for themselves.
+
+Deep Learning is a subset of machine learning that uses neural networks with multiple layers 
+(deep neural networks) to model and understand complex patterns in data. It has been particularly 
+successful in areas like image recognition, natural language processing, and speech recognition.
+
+Natural Language Processing (NLP) is a field of AI that focuses on the interaction between 
+computers and humans through natural language. The ultimate objective of NLP is to read, 
+decipher, understand, and make sense of human languages in a valuable way.
