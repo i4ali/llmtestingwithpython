@@ -4,7 +4,7 @@ from deepeval import evaluate
 from deepeval.metrics import ContextualRelevancyMetric
 from deepeval.test_case import LLMTestCase
 
-from tests.framework.shoe_store_rag import ShoeStoreRAG
+from web_demo.shoe_store_rag import ShoeStoreRAG
 
 
 def test_shoe_store_with_deepeval():

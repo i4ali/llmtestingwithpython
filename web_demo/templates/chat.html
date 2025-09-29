@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shoe Store RAG Chatbot Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦶 Shoe Store RAG Chatbot</h1>
+            <p>Ask me about our store policies, inventory, services, and more!</p>
+        </div>
+
+        <div class="demo-questions">
+            <h3>Try these questions:</h3>
+            <div class="question-buttons">
+                <button class="demo-btn" onclick="askQuestion('What is your return policy?')">Return Policy</button>
+                <button class="demo-btn" onclick="askQuestion('Do you offer student discounts?')">Student Discounts</button>
+                <button class="demo-btn" onclick="askQuestion('What shoe brands do you carry?')">Brands Available</button>
+                <button class="demo-btn" onclick="askQuestion('How long does shipping take?')">Shipping Info</button>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        Welcome! This is the RAG-powered chatbot we'll build together in this course. I can answer questions about our shoe store using real documents from our knowledge base. Try asking me anything!
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <input type="text" id="messageInput" placeholder="Type your question about our shoe store..." onkeypress="handleKeyPress(event)">
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+        <div class="context-panel" id="contextPanel" style="display: none;">
+            <h3>Retrieved Context (RAG Process)</h3>
+            <div id="contextContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let isLoading = false;
+
+        function askQuestion(question) {
+            document.getElementById('messageInput').value = question;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !isLoading) {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            if (isLoading) return;
+
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+
+            addMessage(message, 'user');
+            messageInput.value = '';
+            
+            isLoading = true;
+            document.getElementById('sendBtn').textContent = 'Sending...';
+            document.getElementById('sendBtn').disabled = true;
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`, 'error');
+                } else {
+                    addMessage(data.response, 'bot');
+                    showContext(data.context);
+                }
+            })
+            .catch(error => {
+                addMessage(`Error: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                isLoading = false;
+                document.getElementById('sendBtn').textContent = 'Send';
+                document.getElementById('sendBtn').disabled = false;
+            });
+        }
+
+        function addMessage(content, type) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.textContent = content;
+            
+            messageDiv.appendChild(contentDiv);
+            chatMessages.appendChild(messageDiv);
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showContext(context) {
+            const contextPanel = document.getElementById('contextPanel');
+            const contextContent = document.getElementById('contextContent');
+            
+            if (context && context.length > 0) {
+                contextContent.innerHTML = '';
+                context.forEach((doc, index) => {
+                    const docDiv = document.createElement('div');
+                    docDiv.className = 'context-doc';
+                    docDiv.innerHTML = `<strong>Document ${index + 1}:</strong><br>${doc}`;
+                    contextContent.appendChild(docDiv);
+                });
+                contextPanel.style.display = 'block';
+            }
+        }
+
+        function clearChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = `
+                <div class="message bot-message">
+                    <div class="message-content">
+                        Welcome! This is the RAG-powered chatbot we'll build together in this course. I can answer questions about our shoe store using real documents from our knowledge base. Try asking me anything!
+                    </div>
+                </div>
+            `;
+            document.getElementById('contextPanel').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
